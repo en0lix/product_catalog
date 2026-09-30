@@ -27,3 +27,16 @@ class TestCategory:
         category = Category("Смартфоны", "Мобильные телефоны", products)
         assert len(category.products) == 2
         assert category.products_count == 2
+
+def test_new_product(self) -> None:
+    data = {
+        "name": "Ноутбук",
+        "description": "Игровой ноутбук",
+        "price": 89999.99,
+        "quantity": 3,
+    }
+    product = Product.new_product(data)
+    assert product.name == "Ноутбук"
+    assert product.description == "Игровой ноутбук"
+    assert product.price == 89999.99
+    assert product.quantity == 3

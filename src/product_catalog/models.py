@@ -25,6 +25,24 @@ class Product:
         self.quantity = int(quantity)
         Product.products_count += 1
 
+    @classmethod
+    def new_product(cls, data: dict) -> "Product":
+        """
+        Создаёт объект Product из словаря с параметрами.
+
+        Аргументы:
+            data (dict): Словарь с ключами name, description, price, quantity.
+
+        Возвращает:
+            Product: Новый объект товара.
+        """
+        return cls(
+            name=data["name"],
+            description=data["description"],
+            price=data["price"],
+            quantity=data["quantity"],
+        )
+
     def __repr__(self) -> str:
         return (
             f"Product(name={self.name!r}, description={self.description!r}, "
@@ -39,7 +57,7 @@ class Category:
     Атрибуты:
         name (str): Название категории.
         description (str): Описание категории.
-        products (List[Product]): Список товаров категории.
+        __products (List[Product]): Приватный список товаров категории.
     """
 
     categories_count: int = 0
@@ -48,13 +66,37 @@ class Category:
     def __init__(self, name: str, description: str, products: List[Product]) -> None:
         self.name = name
         self.description = description
-        self.products = list(products) if products else []
+        self.__products = list(products) if products else []
         Category.categories_count += 1
-        self.products_count = len(self.products)
-        Category.products_count += len(self.products)
+        self.products_count = len(self.__products)
+        Category.products_count += len(self.__products)
+
+    def add_product(self, product: Product) -> None:
+        """
+        Добавляет товар в категорию.
+
+        Аргументы:
+            product (Product): Объект товара для добавления.
+        """
+        self.__products.append(product)
+        self.products_count += 1
+        Category.products_count += 1
+
+    @property
+    def products(self) -> str:
+        """
+        Возвращает список товаров категории в виде строки.
+
+        Формат строки:
+            Название продукта, 80 руб. Остаток: 15 шт.
+        """
+        return "\n".join(
+            f"{product.name}, {product.price:g} руб. Остаток: {product.quantity} шт."
+            for product in self.__products
+        )
 
     def __repr__(self) -> str:
         return (
             f"Category(name={self.name!r}, description={self.description!r}, "
-            f"products={self.products!r})"
+            f"products={self.__products!r})"
         )
