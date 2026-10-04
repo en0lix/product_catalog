@@ -12,7 +12,7 @@ class Product:
     Атрибуты:
         name (str): Название товара.
         description (str): Описание товара.
-        __price (float): Приватная цена товара.
+        price (float): Цена товара.
         quantity (int): Количество в наличии.
     """
 
@@ -21,7 +21,7 @@ class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
         self.description = description
-        self.__price = float(price)
+        self.price = float(price)
         self.quantity = int(quantity)
         Product.products_count += 1
 
@@ -43,32 +43,10 @@ class Product:
             quantity=data["quantity"],
         )
 
-    @property
-    def price(self) -> float:
-        """Геттер для приватного атрибута цены."""
-        return self.__price
-
-    @price.setter
-    def price(self, value: float) -> None:
-        """
-        Сеттер для приватного атрибута цены.
-
-        Проверяет, что цена не нулевая и не отрицательная.
-
-        Аргументы:
-            value (float): Новое значение цены.
-
-        Исключения:
-            ValueError: Если цена <= 0.
-        """
-        if value <= 0:
-            raise ValueError("Цена должна быть больше нуля")
-        self.__price = float(value)
-
     def __repr__(self) -> str:
         return (
             f"Product(name={self.name!r}, description={self.description!r}, "
-            f"price={self.__price}, quantity={self.quantity})"
+            f"price={self.price}, quantity={self.quantity})"
         )
 
 
@@ -90,7 +68,6 @@ class Category:
         self.description = description
         self.__products = list(products) if products else []
         Category.categories_count += 1
-        self.products_count = len(self.__products)
         Category.products_count += len(self.__products)
 
     def add_product(self, product: Product) -> None:
@@ -101,7 +78,6 @@ class Category:
             product (Product): Объект товара для добавления.
         """
         self.__products.append(product)
-        self.products_count += 1
         Category.products_count += 1
 
     @property
