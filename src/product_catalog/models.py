@@ -12,7 +12,7 @@ class Product:
     Атрибуты:
         name (str): Название товара.
         description (str): Описание товара.
-        price (float): Цена товара.
+        __price (float): Приватная цена товара.
         quantity (int): Количество в наличии.
     """
 
@@ -21,7 +21,7 @@ class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
         self.description = description
-        self.price = float(price)
+        self.__price = float(price)
         self.quantity = int(quantity)
         Product.products_count += 1
 
@@ -43,10 +43,32 @@ class Product:
             quantity=data["quantity"],
         )
 
+    @property
+    def price(self) -> float:
+        """Геттер для приватного атрибута цены."""
+        return self.__price
+
+    @price.setter
+    def price(self, value: float) -> None:
+        """
+        Сеттер для приватного атрибута цены.
+
+        Проверяет, что цена не нулевая и не отрицательная.
+
+        Аргументы:
+            value (float): Новое значение цены.
+
+        Исключения:
+            ValueError: Если цена <= 0.
+        """
+        if value <= 0:
+            raise ValueError("Цена должна быть больше нуля")
+        self.__price = float(value)
+
     def __repr__(self) -> str:
         return (
             f"Product(name={self.name!r}, description={self.description!r}, "
-            f"price={self.price}, quantity={self.quantity})"
+            f"price={self.__price}, quantity={self.quantity})"
         )
 
 
