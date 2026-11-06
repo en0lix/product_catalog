@@ -1,8 +1,8 @@
 """
-Модуль models содержит классы Product и Category.
+Модуль models содержит классы Product, Category и CategoryIterator.
 """
 
-from typing import List
+from typing import Iterator, List
 
 
 class Product:
@@ -12,7 +12,7 @@ class Product:
     Атрибуты:
         name (str): Название товара.
         description (str): Описание товара.
-        price (float): Цена товара.
+        __price (float): Приватный атрибут цены товара.
         quantity (int): Количество в наличии.
     """
 
@@ -21,9 +21,21 @@ class Product:
     def __init__(self, name: str, description: str, price: float, quantity: int) -> None:
         self.name = name
         self.description = description
-        self.price = float(price)
+        self.__price = float(price)
         self.quantity = int(quantity)
         Product.products_count += 1
+
+    @property
+    def price(self) -> float:
+        """Геттер для приватного атрибута цены."""
+        return self.__price
+
+    @price.setter
+    def price(self, value: float) -> None:
+        """Сеттер для приватного атрибута цены."""
+        if value <= 0:
+            raise ValueError("Цена должна быть положительной")
+        self.__price = float(value)
 
     @classmethod
     def new_product(cls, data: dict) -> "Product":
@@ -43,11 +55,50 @@ class Product:
             quantity=data["quantity"],
         )
 
+    def __str__(self) -> str:
+        """Строковое представление товара."""
+        return f"{self.name}, {self.__price:g} руб. Остаток: {self.quantity} шт."
+
+    def __add__(self, other: "Product") -> float:
+        """
+        Сложение двух товаров: сумма произведений цены на количество.
+
+        Пример: 100×10 + 200×2 = 1400.
+        """
+        if not isinstance(other, Product):
+            raise TypeError(
+                f"Нельзя сложить Product с {type(other).__name__}"
+            )
+        return self.__price * self.quantity + other.__price * other.quantity
+
     def __repr__(self) -> str:
         return (
             f"Product(name={self.name!r}, description={self.description!r}, "
-            f"price={self.price}, quantity={self.quantity})"
+            f"price={self.__price}, quantity={self.quantity})"
         )
+
+
+class CategoryIterator:
+    """
+    Итератор для перебора товаров категории.
+
+    Принимает объект Category и по одному возвращает товары из её списка.
+    """
+
+    def __init__(self, category: "Category") -> None:
+        self._category = category
+        self._index = 0
+
+    def __iter__(self) -> "CategoryIterator":
+        return self
+
+    def __next__(self) -> Product:
+        products = self._category._Category__products
+        if self._index >= len(products):
+            raise StopIteration
+        product = products[self._index]
+        self._index += 1
+        return product
 
 
 class Category:
@@ -68,6 +119,7 @@ class Category:
         self.description = description
         self.__products = list(products) if products else []
         Category.categories_count += 1
+        self.products_count = len(self.__products)
         Category.products_count += len(self.__products)
 
     def add_product(self, product: Product) -> None:
@@ -88,10 +140,16 @@ class Category:
         Формат строки:
             Название продукта, 80 руб. Остаток: 15 шт.
         """
-        return "\n".join(
-            f"{product.name}, {product.price:g} руб. Остаток: {product.quantity} шт."
-            for product in self.__products
-        )
+        return "\n".join(str(product) for product in self.__products)
+
+    def __str__(self) -> str:
+        """Строковое представление категории."""
+        total_quantity = sum(product.quantity for product in self.__products)
+        return f"{self.name}, количество продуктов: {total_quantity} шт."
+
+    def __iter__(self) -> CategoryIterator:
+        """Позволяет перебирать товары категории в цикле for."""
+        return CategoryIterator(self)
 
     def __repr__(self) -> str:
         return (
