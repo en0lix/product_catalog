@@ -13,3 +13,14 @@
 
 ```bash
 pip install -e ".[dev]"
+
+## Функциональность
+
+- `BaseProduct` — абстрактный класс, родитель всех продуктов.
+- `ReprMixin` — миксин, печатает `repr` объекта при создании.
+- `Product(BaseProduct, ReprMixin)` — базовый товар.
+- `Smartphone(Product)`, `LawnGrass(Product)` — наследники.
+- `Category` — категория товаров с приватным списком.
+- `CategoryIterator` — перебор товаров категории.
+
+## Покрытие тестами
